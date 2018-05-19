@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Usage: sync-branch
 # Script for automating synchronization of master and some branch in git repository, with respect to Uchi.ru git workflow.
 # Script colors git commands and error messages for easy spotting.
 #
@@ -11,11 +11,10 @@
 # 5) Rebase master into branch
 # 6) Checkout master
 # 7) Merge branch into master
-# *) Notify user that he can push changes
+# 8) Notify user that he can push changes
 #
 # Possible errors are: git is on master branch or git commands errors. You'll be notified.
-#
-# alexch, uchi.ru
+# alexch
 
 # commands highlight
 function col {

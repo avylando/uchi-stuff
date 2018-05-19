@@ -5,7 +5,7 @@ Usage (e.g. `sync-branch.sh`):
 
 Set rights to execute:
 
-`chmod u+x sync-branch.sh`
+`chmod ugo+rwx sync-branch.sh`
 
 Copy in some directory presented in $PATH to make accessible in terminal from any directory:
 
