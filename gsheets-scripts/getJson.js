@@ -14,15 +14,15 @@ var audioPaths = {
 // creates a custom menu in Google Sheets when the spreadsheet opens
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('Tools')
-    .addItem('Make JSON const entries', 'makeJsonSidebar_')
+    .createMenu(msgs.menu.label)
+    .addItem(msgs.menu.entry, 'makeJsonSidebar_')
     .addToUi();
 }
 
 // accessible from 'Make JSON const entries' menu
 function makeJsonSidebar_() {
   var htmlOutput = HtmlService.createHtmlOutput(getSidebarContent_()).setTitle(
-    'Chunk json const entries'
+    msgs.sidebar.title
   );
   SpreadsheetApp.getUi().showSidebar(htmlOutput);
 }
@@ -39,17 +39,24 @@ function getCopyScript_() {
   dummy.select();
   document.execCommand('copy');
   document.body.removeChild(dummy);
-  document.getElementById('copy-button').innerHTML = 'Copied!';
+  document.getElementById('copy-button').innerHTML = msgs.sidebar.afterClick;
 }
 
 // s.e.
 function getSidebarContent_() {
+  var msg = { sidebar: { afterClick: msgs.sidebar.afterClick } };
   return (
     '' +
     '<script>' +
+    'var msgs = ' +
+    JSON.stringify(msg) +
+    ';</script>' +
+    '<script>' +
     getCopyScript_.toString() +
     '</script>' +
-    '<button onclick="getCopyScript_()" id="copy-button">Copy to clipboard</button>' +
+    '<button onclick="getCopyScript_()" id="copy-button">' +
+    msgs.sidebar.click +
+    '</button>' +
     '<pre id="jsonData">' +
     makeJson_() +
     '</pre>'
@@ -69,8 +76,7 @@ function makeJson_() {
 // assert range and values in columns 1,2,5 (texts and json key)
 function assert_(range) {
   var isErrorInRange = !range || range.length < 1 || range[0].length < 5;
-  if (isErrorInRange)
-    throw new Error('Please select range of cells with 5 columns or more');
+  if (isErrorInRange) throw new Error(msgs.error.badRange);
   var isErrorInValues = range.some(function(row) {
     return (
       isErrorOrEmpty_(row[0]) ||
@@ -78,10 +84,7 @@ function assert_(range) {
       isErrorOrEmpty_(row[4])
     );
   });
-  if (isErrorInValues)
-    throw new Error(
-      'Cells in columns 1,2,5 must contain non-empty, non-error values'
-    );
+  if (isErrorInValues) throw new Error(msgs.error.badValues);
   assertJsonKeysDuplicates_(
     range.map(function(row) {
       return row[4];
@@ -99,18 +102,15 @@ function assertJsonKeysDuplicates_(array) {
       duplicates.push(val);
   }
   duplicates.length > 0 && notifyAboutDuplicates_(duplicates);
-  Logger.log(array);
-  Logger.log(duplicates);
 }
 
 // s.e.
 function notifyAboutDuplicates_(duplicates) {
-  var msg = 'You have duplicates in json keys column (#5):\n\n';
+  var msg = msgs.error.duplicates.before + '\n\n';
   for (var i = 0; i < duplicates.length; i++) {
     msg += duplicates[i] + '\n';
   }
-  msg +=
-    '\nJson will be formed, but consider to change keys in json file to avoid compilation errors.';
+  msg += '\n' + msgs.error.duplicates.after;
   SpreadsheetApp.getUi().alert(msg);
 }
 
@@ -154,7 +154,7 @@ function jsonFromRow_(row) {
 // text/audio entry
 function makeLangEntry_(lang, text, audioFilename) {
   var currentPaths = audioPaths[lang];
-  if (!currentPaths) throw new Error('Cant find paths for language: ' + lang);
+  if (!currentPaths) throw new Error(msgs.error.langPath + ': ' + lang);
   var result = {
     text: text
   };
@@ -200,3 +200,27 @@ function escapeHtml_(string) {
     return entityMap[s];
   });
 }
+
+// i18n
+var msgs = {
+  menu: {
+    label: 'Tools',
+    entry: 'Make JSON const entries'
+  },
+  sidebar: {
+    title: 'JSON',
+    click: 'Copy to clipboard',
+    afterClick: 'Copied!'
+  },
+  error: {
+    badRange: 'Please select range of cells with 5 columns or more',
+    badValues:
+      'Cells in columns 1,2,5 must contain non-empty, non-error values',
+    duplicates: {
+      before: 'You have duplicates in json keys column (#5):',
+      after:
+        'Json will be formed, but consider to change keys in json file to avoid compilation errors.'
+    },
+    langPath: 'Cant find paths for language'
+  }
+};
