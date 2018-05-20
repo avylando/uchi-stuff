@@ -40,6 +40,7 @@ function getCopyScript_() {
   document.execCommand('copy');
   document.body.removeChild(dummy);
   document.getElementById('copy-button').innerHTML = msgs.sidebar.afterClick;
+  document.getElementById('copy-button').disabled = true;
 }
 
 // s.e.
@@ -205,22 +206,22 @@ function escapeHtml_(string) {
 var msgs = {
   menu: {
     label: 'Tools',
-    entry: 'Make JSON const entries'
+    entry: 'Сделать JSON'
   },
   sidebar: {
     title: 'JSON',
-    click: 'Copy to clipboard',
-    afterClick: 'Copied!'
+    click: 'Скопировать',
+    afterClick: 'Скопировано!'
   },
   error: {
-    badRange: 'Please select range of cells with 5 columns or more',
+    badRange: 'Выберите диапазон ячеек из 5 или более колонок',
     badValues:
-      'Cells in columns 1,2,5 must contain non-empty, non-error values',
+      'Значения в колонках 1, 2, 5 должны содержать непустые и неошибочные (для формул) значения',
     duplicates: {
-      before: 'You have duplicates in json keys column (#5):',
+      before: 'В колонке ключей JSON (#5) обнаружены повторения:',
       after:
-        'Json will be formed, but consider to change keys in json file to avoid compilation errors.'
+        'JSON будет сформирован, но для избежания ошибок компиляции JSON файла необходимо использовать уникальные значения.'
     },
-    langPath: 'Cant find paths for language'
+    langPath: 'Не найден путь для языка'
   }
 };
