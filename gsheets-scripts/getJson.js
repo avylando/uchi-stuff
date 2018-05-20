@@ -31,9 +31,9 @@ function getCopyScript_() {
   var dummy = document.createElement('textarea');
   document.body.appendChild(dummy);
   dummy.setAttribute('id', 'dummy_id');
-  document.getElementById('dummy_id').value = unescapeHtml_(
-    document.getElementById('jsonData').innerHTML
-  );
+  document.getElementById('dummy_id').value = document.getElementById(
+    'jsonData'
+  ).textContent;
   dummy.select();
   document.execCommand('copy');
   document.body.removeChild(dummy);
@@ -44,9 +44,6 @@ function getCopyScript_() {
 function getSidebarContent_() {
   return (
     '' +
-    '<script>' +
-    unescapeHtml_.toString() +
-    '</script>' +
     '<script>' +
     getCopyScript_.toString() +
     '</script>' +
@@ -197,24 +194,4 @@ function escapeHtml_(string) {
   return String(string).replace(/[&<>"'`=\/]/g, function(s) {
     return entityMap[s];
   });
-}
-
-// reversed by me
-function unescapeHtml_(string) {
-  var entityMap = {
-    '&amp;': '&',
-    '&lt;': '<',
-    '&gt;': '>',
-    '&quot;': '"',
-    '&#39;': "'",
-    '&#x2F;': '/',
-    '&#x60;': '`',
-    '&#x3D;': '='
-  };
-  return String(string).replace(
-    /&amp;|&lt;|&gt;|&quot;|&#39;|&#x2F;|&#x60;|&#x3D;/g,
-    function(s) {
-      return entityMap[s];
-    }
-  );
 }
