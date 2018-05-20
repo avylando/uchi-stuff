@@ -22,7 +22,7 @@ function onOpen() {
 }
 
 // ui
-function makeSidebar() {
+function makeSidebar_() {
   var htmlOutput = HtmlService.createHtmlOutput(getSidebarContent_()).setTitle(
     msgs.sidebar.title
   );
@@ -33,18 +33,18 @@ var ISAUTOKEYS;
 // accessible from 'Make JSON' menu
 function makeJsonSidebar_() {
   ISAUTOKEYS = false;
-  makeSidebar();
+  makeSidebar_();
 }
 
 // accessible from 'Make JSON autokeys' menu
 function makeJsonSidebarAutoKeys_() {
   ISAUTOKEYS = true;
-  makeSidebar();
+  makeSidebar_();
 }
 
 function showHelpSidebar_() {
   var htmlOutput = HtmlService.createHtmlOutput(
-    msgs.sidebar.help.content
+    getSidebarHelpContent_()
   ).setTitle(msgs.sidebar.help.title);
   SpreadsheetApp.getUi().showSidebar(htmlOutput);
 }
@@ -86,6 +86,37 @@ function getSidebarContent_() {
   );
 }
 
+// s.e.
+function getSidebarHelpContent_() {
+  return (
+    '' +
+    '<style>table { border-collapse: collapse; } th, td { border: 1px solid black; text-align: left; font-style: italic }</style>' +
+    '<p>Пункт меню <br><b>' +
+    msgs.menu.entries.auto +
+    '</b><br> используется для генерации JSON с созданием ключа на основе английского текста (столбец #1).</p>' +
+    '<p>Для использования нужно предварительно выбрать диапазон ячеек вида:</p>' +
+    '<table>' +
+    //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th></tr>'
+    '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td></tr>' +
+    '</table>' +
+    '<p>Количество строк - произвольное. Первый и второй столбцы должны содержать непустые и неошибочные (для формул) значения.</p>' +
+    '<hr>' +
+    '<p>Пункт меню <br><b>' +
+    msgs.menu.entries.manual +
+    '</b><br> используется для генерации JSON с созданием ключа на основе пользовательского столбца (#5).</p>' +
+    '<p>Для использования нужно предварительно выбрать диапазон ячеек вида:</p>' +
+    '<table>' +
+    //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th><th>JSON key</th></tr>'
+    '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td><td>solveText</td></tr>' +
+    '</table>' +
+    '<p>Количество строк - произвольное. Первый, второй и пятый столбцы должны содержать непустые и неошибочные (для формул) значения.</p>' +
+    '<hr>' +
+    '<p><i>Для обоих пунктов меню:</i><p>' +
+    "<p>Если ячейки в столбцах с названием аудиофайлов (<i>'voice file'</i>) пусты или содержат ошибочные значения, они будут пропущены при формировании JSON.</p>" +
+    '<p>Eсли среди JSON ключей найдены повторения, будет выведено уведомление.</p>' +
+    '<p>Если диапазон содержит меньшее количество столбцов или значения ячеек в столбцах (указаны в описании пунктов меню) пусты или ошибочны, будет выведено сообщение об ошибке.</p>'
+  );
+}
 // ************************ main function ***************************
 // assert current selected range and makes json string from it
 function makeJson_() {
@@ -255,10 +286,10 @@ function escapeHtml_(string) {
 // i18n
 var msgs = {
   menu: {
-    label: 'Tools',
+    label: 'Uchiru',
     entries: {
-      auto: 'Сделать JSON (автоматическая генерация JSON ключей)',
-      manual: 'Сделать JSON (пользовательские JSON ключи)',
+      auto: 'Сделать JSON',
+      manual: 'Сделать JSON (пользовательские ключи)',
       help: 'Справка по использованию'
     }
   },
@@ -267,8 +298,7 @@ var msgs = {
     click: 'Скопировать',
     afterClick: 'Скопировано!',
     help: {
-      title: 'Справка',
-      content: 'Справка'
+      title: 'Справка'
     }
   },
   error: {
