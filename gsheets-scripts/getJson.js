@@ -16,15 +16,29 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu(msgs.menu.label)
     .addItem(msgs.menu.entry, 'makeJsonSidebar_')
+    .addItem(msgs.menu.entryAuto, 'makeJsonSidebarAutoKeys_')
     .addToUi();
 }
 
-// accessible from 'Make JSON const entries' menu
-function makeJsonSidebar_() {
+// ui
+function makeSidebar() {
   var htmlOutput = HtmlService.createHtmlOutput(getSidebarContent_()).setTitle(
     msgs.sidebar.title
   );
   SpreadsheetApp.getUi().showSidebar(htmlOutput);
+}
+
+var ISAUTOKEYS;
+// accessible from 'Make JSON' menu
+function makeJsonSidebar_() {
+  ISAUTOKEYS = false;
+  makeSidebar();
+}
+
+// accessible from 'Make JSON autokeys' menu
+function makeJsonSidebarAutoKeys_() {
+  ISAUTOKEYS = true;
+  makeSidebar();
 }
 
 // ************************ sidebar constructing ********************************
@@ -70,14 +84,14 @@ function makeJson_() {
   var rangeValues = SpreadsheetApp.getActiveSheet()
     .getActiveRange()
     .getValues();
-  assert_(rangeValues);
+  ISAUTOKEYS ? assertAuto_(rangeValues) : assert_(rangeValues);
   return rangeValues.map(jsonStringFromRow_).join(',\n');
 }
 
 // assert range and values in columns 1,2,5 (texts and json key)
 function assert_(range) {
   var isErrorInRange = !range || range.length < 1 || range[0].length < 5;
-  if (isErrorInRange) throw new Error(msgs.error.badRange);
+  if (isErrorInRange) throw new Error(msgs.error.badRange.manual);
   var isErrorInValues = range.some(function(row) {
     return (
       isErrorOrEmpty_(row[0]) ||
@@ -85,10 +99,25 @@ function assert_(range) {
       isErrorOrEmpty_(row[4])
     );
   });
-  if (isErrorInValues) throw new Error(msgs.error.badValues);
+  if (isErrorInValues) throw new Error(msgs.error.badValues.manual);
   assertJsonKeysDuplicates_(
     range.map(function(row) {
       return row[4];
+    })
+  );
+}
+
+// assert range and values in columns 1,2 (texts)
+function assertAuto_(range) {
+  var isErrorInRange = !range || range.length < 1 || range[0].length < 4;
+  if (isErrorInRange) throw new Error(msgs.error.badRange.auto);
+  var isErrorInValues = range.some(function(row) {
+    return isErrorOrEmpty_(row[0]) || isErrorOrEmpty_(row[1]);
+  });
+  if (isErrorInValues) throw new Error(msgs.error.badValues.auto);
+  assertJsonKeysDuplicates_(
+    range.map(function(row) {
+      return varName_(row[0]);
     })
   );
 }
@@ -107,7 +136,10 @@ function assertJsonKeysDuplicates_(array) {
 
 // s.e.
 function notifyAboutDuplicates_(duplicates) {
-  var msg = msgs.error.duplicates.before + '\n\n';
+  var msg =
+    (ISAUTOKEYS
+      ? msgs.error.duplicates.before.auto
+      : msgs.error.duplicates.before.manual) + '\n\n';
   for (var i = 0; i < duplicates.length; i++) {
     msg += duplicates[i] + '\n';
   }
@@ -130,18 +162,13 @@ function jsonStringFromRow_(row) {
     .join('\n');
 }
 
-// audio file name without extension
-function voiceName_(filename) {
-  return filename.split('.')[0];
-}
-
 // row is 5-item array
 function jsonFromRow_(row) {
   var textEng = escapeHtml_(row[0]);
   var textEsp = escapeHtml_(row[1]);
   var audioEng = voiceName_(row[2]);
   var audioEsp = voiceName_(row[3]);
-  var jsonKey = escapeHtml_(row[4]);
+  var jsonKey = ISAUTOKEYS ? varName_(row[0]) : escapeHtml_(row[4]);
 
   var json = {};
   json[jsonKey] = {
@@ -169,6 +196,21 @@ function makeLangEntry_(lang, text, audioFilename) {
 }
 
 // ************************ helpers ***************************
+// audio file name without extension
+function voiceName_(filename) {
+  return filename.split('.')[0];
+}
+
+// by sergey orlov
+function varName_(str) {
+  str = str.toLowerCase();
+  str = str.replace(/\W/gim, '_');
+  if (str[str.length - 1] == '_') {
+    str = str.substr(0, str.length - 1);
+  }
+  return str;
+}
+
 // s.e.
 function isErrorOrEmpty_(cell) {
   var errorValues = [
@@ -206,7 +248,8 @@ function escapeHtml_(string) {
 var msgs = {
   menu: {
     label: 'Tools',
-    entry: 'Сделать JSON'
+    entry: 'Сделать JSON',
+    entryAuto: 'Сделать JSON (автоматическая генерация JSON ключей)'
   },
   sidebar: {
     title: 'JSON',
@@ -214,11 +257,21 @@ var msgs = {
     afterClick: 'Скопировано!'
   },
   error: {
-    badRange: 'Выберите диапазон из 5 или более столбцов',
-    badValues:
-      'Значения в столбцах 1, 2, 5 должны содержать непустые и неошибочные (для формул) значения',
+    badRange: {
+      auto: 'Выберите диапазон из 4 столбцов',
+      manual: 'Выберите диапазон из 5 столбцов'
+    },
+    badValues: {
+      auto:
+        'Значения в столбцах 1, 2 должны содержать непустые и неошибочные (для формул) значения',
+      manual:
+        'Значения в столбцах 1, 2, 5 должны содержать непустые и неошибочные (для формул) значения'
+    },
     duplicates: {
-      before: 'В столбце ключей JSON (#5) обнаружены повторения:',
+      before: {
+        auto: 'При генерации JSON ключей обнаружены повторения:',
+        manual: 'В столбце ключей JSON (#5) обнаружены повторения:'
+      },
       after:
         'JSON будет сформирован, но для избежания ошибок компиляции JSON файла необходимо использовать уникальные значения.'
     },
