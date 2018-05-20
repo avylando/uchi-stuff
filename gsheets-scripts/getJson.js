@@ -15,8 +15,9 @@ var audioPaths = {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu(msgs.menu.label)
-    .addItem(msgs.menu.entry, 'makeJsonSidebar_')
-    .addItem(msgs.menu.entryAuto, 'makeJsonSidebarAutoKeys_')
+    .addItem(msgs.menu.entries.auto, 'makeJsonSidebarAutoKeys_')
+    .addItem(msgs.menu.entries.manual, 'makeJsonSidebar_')
+    .addItem(msgs.menu.entries.help, 'showHelpSidebar_')
     .addToUi();
 }
 
@@ -39,6 +40,13 @@ function makeJsonSidebar_() {
 function makeJsonSidebarAutoKeys_() {
   ISAUTOKEYS = true;
   makeSidebar();
+}
+
+function showHelpSidebar_() {
+  var htmlOutput = HtmlService.createHtmlOutput(
+    msgs.sidebar.help.content
+  ).setTitle(msgs.sidebar.help.title);
+  SpreadsheetApp.getUi().showSidebar(htmlOutput);
 }
 
 // ************************ sidebar constructing ********************************
@@ -248,13 +256,20 @@ function escapeHtml_(string) {
 var msgs = {
   menu: {
     label: 'Tools',
-    entry: 'Сделать JSON',
-    entryAuto: 'Сделать JSON (автоматическая генерация JSON ключей)'
+    entries: {
+      auto: 'Сделать JSON (автоматическая генерация JSON ключей)',
+      manual: 'Сделать JSON (пользовательские JSON ключи)',
+      help: 'Справка по использованию'
+    }
   },
   sidebar: {
     title: 'JSON',
     click: 'Скопировать',
-    afterClick: 'Скопировано!'
+    afterClick: 'Скопировано!',
+    help: {
+      title: 'Справка',
+      content: 'Справка'
+    }
   },
   error: {
     badRange: {
