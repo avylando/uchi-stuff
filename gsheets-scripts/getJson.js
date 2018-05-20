@@ -66,56 +66,41 @@ function getCopyScript_() {
 }
 
 // s.e.
+// prettier-ignore
 function getSidebarContent_() {
   var msg = { sidebar: { afterClick: msgs.sidebar.afterClick } };
-  return (
-    '' +
-    '<script>' +
-    'var msgs = ' +
-    JSON.stringify(msg) +
-    ';</script>' +
-    '<script>' +
-    getCopyScript_.toString() +
-    '</script>' +
-    '<button onclick="getCopyScript_()" id="copy-button">' +
-    msgs.sidebar.click +
-    '</button>' +
-    '<pre id="jsonData">' +
-    makeJson_() +
-    '</pre>'
-  );
+  return ''
+  + '<script> var msgs = ' + JSON.stringify(msg) + ';</script>'
+  + '<script>' + getCopyScript_.toString() + '</script>'
+  + '<button onclick="getCopyScript_()" id="copy-button">' + msgs.sidebar.click + '</button>'
+  + '<pre id="jsonData">' + makeJson_() + '</pre>';
 }
 
 // s.e.
+// prettier-ignore
 function getSidebarHelpContent_() {
-  return (
-    '' +
-    '<style>table { border-collapse: collapse; } th, td { border: 1px solid black; text-align: left; font-style: italic }</style>' +
-    '<p>Пункт меню <br><b>' +
-    msgs.menu.entries.auto +
-    '</b><br> используется для генерации JSON с созданием ключа на основе английского текста (столбец #1).</p>' +
-    '<p>Для использования нужно предварительно выбрать диапазон ячеек вида:</p>' +
-    '<table>' +
-    //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th></tr>'
-    '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td></tr>' +
-    '</table>' +
-    '<p>Количество строк - произвольное. Первый и второй столбцы должны содержать непустые и неошибочные (для формул) значения.</p>' +
-    '<hr>' +
-    '<p>Пункт меню <br><b>' +
-    msgs.menu.entries.manual +
-    '</b><br> используется для генерации JSON с созданием ключа на основе пользовательского столбца (#5).</p>' +
-    '<p>Для использования нужно предварительно выбрать диапазон ячеек вида:</p>' +
-    '<table>' +
-    //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th><th>JSON key</th></tr>'
-    '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td><td>solveText</td></tr>' +
-    '</table>' +
-    '<p>Количество строк - произвольное. Первый, второй и пятый столбцы должны содержать непустые и неошибочные (для формул) значения.</p>' +
-    '<hr>' +
-    '<p><i>Для обоих пунктов меню:</i><p>' +
-    "<p>Если ячейки в столбцах с названием аудиофайлов (<i>'voice file'</i>) пусты или содержат ошибочные значения, они будут пропущены при формировании JSON.</p>" +
-    '<p>Eсли среди JSON ключей найдены повторения, будет выведено уведомление.</p>' +
-    '<p>Если диапазон содержит меньшее количество столбцов или значения ячеек в столбцах (указаны в описании пунктов меню) пусты или ошибочны, будет выведено сообщение об ошибке.</p>'
-  );
+  return ''
+  + '<style>table { border-collapse: collapse; } th, td { border: 1px solid black; text-align: left; font-style: italic }</style>'
+  + '<p>Пункт меню <br><b>' + msgs.menu.entries.auto + '</b><br> используется для генерации JSON с созданием ключа на основе английского текста (столбец #1).</p>'
+  + '<p>Для использования нужно предварительно выбрать диапазон ячеек с содержимым вида:</p>'
+  + '<table>'
+  //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th></tr>'
+  + '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td></tr>'
+  + '</table>'
+  + '<p>Количество строк - произвольное. Первый и второй столбцы должны содержать непустые и неошибочные (для формул) значения.</p>'
+  + '<hr>'
+  + '<p>Пункт меню <br><b>' + msgs.menu.entries.manual + '</b><br> используется для генерации JSON с созданием ключа на основе пользовательского столбца (#5).</p>'
+  + '<p>Для использования нужно предварительно выбрать диапазон ячеек с содержимым вида:</p>'
+  + '<table>'
+  //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th><th>JSON key</th></tr>'
+  + '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td><td>solveText</td></tr>'
+  + '</table>'
+  + '<p>Количество строк - произвольное. Первый, второй и пятый столбцы должны содержать непустые и неошибочные (для формул) значения.</p>'
+  + '<hr>'
+  + '<p><i>Для обоих пунктов меню:</i><p>'
+  + '<p>Если ячейки в столбцах с названием аудиофайлов (<i>\'voice file\'</i>) пусты или содержат ошибочные значения, они будут пропущены при формировании JSON.</p>'
+  + '<p>Eсли среди JSON ключей найдены повторения, будет выведено уведомление.</p>'
+  + '<p>Если диапазон содержит меньшее количество столбцов или значения ячеек в столбцах (указаны в описании пунктов меню) пусты или ошибочны, будет выведено сообщение об ошибке.</p>';
 }
 // ************************ main function ***************************
 // assert current selected range and makes json string from it
@@ -178,7 +163,7 @@ function notifyAboutDuplicates_(duplicates) {
   var msg =
     (ISAUTOKEYS
       ? msgs.error.duplicates.before.auto
-      : msgs.error.duplicates.before.manual) + '\n\n';
+      : msgs.error.duplicates.before.manual) + ':\n\n';
   for (var i = 0; i < duplicates.length; i++) {
     msg += duplicates[i] + '\n';
   }
@@ -203,11 +188,13 @@ function jsonStringFromRow_(row) {
 
 // row is 5-item array
 function jsonFromRow_(row) {
-  var textEng = escapeHtml_(row[0]);
-  var textEsp = escapeHtml_(row[1]);
-  var audioEng = voiceName_(row[2]);
-  var audioEsp = voiceName_(row[3]);
-  var jsonKey = ISAUTOKEYS ? varName_(row[0]) : escapeHtml_(row[4]);
+  var textEng = escapeHtml_(row[0].trim());
+  var textEsp = escapeHtml_(row[1].trim());
+  var audioEng = voiceName_(row[2].trim());
+  var audioEsp = voiceName_(row[3].trim());
+  var jsonKey = ISAUTOKEYS
+    ? varName_(row[0].trim())
+    : escapeHtml_(row[4].trim());
 
   var json = {};
   json[jsonKey] = {
@@ -240,7 +227,7 @@ function voiceName_(filename) {
   return filename.split('.')[0];
 }
 
-// by sergey orlov
+// by Sergey Orlov
 function varName_(str) {
   str = str.toLowerCase();
   str = str.replace(/\W/gim, '_');
@@ -261,7 +248,10 @@ function isErrorOrEmpty_(cell) {
     '#REF!',
     '#NUM!',
     '#VALUE!',
-    '#DIV/0!'
+    '#DIV/0!',
+    '#Н/Д',
+    '#ИМЯ?',
+    '#ОШИБКА!'
   ];
   return errorValues.indexOf(cell) !== -1;
 }
@@ -314,11 +304,11 @@ var msgs = {
     },
     duplicates: {
       before: {
-        auto: 'При генерации JSON ключей обнаружены повторения:',
-        manual: 'В столбце ключей JSON (#5) обнаружены повторения:'
+        auto: 'При генерации JSON ключей обнаружены повторения',
+        manual: 'В столбце ключей JSON (#5) обнаружены повторения'
       },
       after:
-        'JSON будет сформирован, но для избежания ошибок компиляции JSON файла необходимо использовать уникальные значения.'
+        'JSON будет сформирован, но для избежания ошибок компиляции необходимо использовать уникальные значения.'
     },
     langPath: 'Не найден путь для языка'
   }
