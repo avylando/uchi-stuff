@@ -10,6 +10,7 @@ var audioPaths = {
   }
 };
 
+// ************************ making gsheets menu ********************************
 // creates a custom menu in Google Sheets when the spreadsheet opens
 function onOpen() {
   SpreadsheetApp.getUi()
@@ -26,6 +27,7 @@ function makeJsonSidebar_() {
   SpreadsheetApp.getUi().showSidebar(htmlOutput);
 }
 
+// ************************ sidebar constructing ********************************
 // this function is used in sidebar to copy json to clipboard
 function getCopyScript_() {
   var dummy = document.createElement('textarea');
@@ -54,6 +56,7 @@ function getSidebarContent_() {
   );
 }
 
+// ************************ main function ***************************
 // assert current selected range and makes json string from it
 function makeJson_() {
   var rangeValues = SpreadsheetApp.getActiveSheet()
@@ -61,31 +64,6 @@ function makeJson_() {
     .getValues();
   assert_(rangeValues);
   return rangeValues.map(jsonStringFromRow_).join(',\n');
-}
-
-// s.e.
-function notifyAboutDuplicates_(duplicates) {
-  var msg = 'You have duplicates in json keys column (#5):\n\n';
-  for (var i = 0; i < duplicates.length; i++) {
-    msg += duplicates[i] + '\n';
-  }
-  msg +=
-    '\nJson will be formed, but consider to change keys in json file to avoid compilation errors.';
-  SpreadsheetApp.getUi().alert(msg);
-}
-
-// find and notify user about duplicates in json keys column
-function assertJsonKeysDuplicates_(array) {
-  var duplicates = [];
-  for (var i = 0; i < array.length; i++) {
-    var val = array[i];
-    array.indexOf(val, i + 1) > -1 &&
-      duplicates.indexOf(val) === -1 &&
-      duplicates.push(val);
-  }
-  duplicates.length > 0 && notifyAboutDuplicates_(duplicates);
-  Logger.log(array);
-  Logger.log(duplicates);
 }
 
 // assert range and values in columns 1,2,5 (texts and json key)
@@ -111,36 +89,44 @@ function assert_(range) {
   );
 }
 
-// s.e.
-function isErrorOrEmpty_(cell) {
-  var errorValues = [
-    '',
-    '#N/A',
-    '#ERROR!',
-    '#NULL!',
-    '#NAME?',
-    '#REF!',
-    '#NUM!',
-    '#VALUE!',
-    '#DIV/0!'
-  ];
-  return errorValues.indexOf(cell) !== -1;
+// find and notify user about duplicates in json keys column
+function assertJsonKeysDuplicates_(array) {
+  var duplicates = [];
+  for (var i = 0; i < array.length; i++) {
+    var val = array[i];
+    array.indexOf(val, i + 1) > -1 &&
+      duplicates.indexOf(val) === -1 &&
+      duplicates.push(val);
+  }
+  duplicates.length > 0 && notifyAboutDuplicates_(duplicates);
+  Logger.log(array);
+  Logger.log(duplicates);
 }
 
-// text/audio entry
-function makeLangEntry_(lang, text, audioFilename) {
-  var currentPaths = audioPaths[lang];
-  if (!currentPaths) throw new Error('Cant find paths for language: ' + lang);
-  var result = {
-    text: text
-  };
-  if (!isErrorOrEmpty_(audioFilename)) {
-    result.audio = {
-      mp3: currentPaths.mp3 + audioFilename + '.mp3',
-      ogg: currentPaths.ogg + audioFilename + '.ogg'
-    };
+// s.e.
+function notifyAboutDuplicates_(duplicates) {
+  var msg = 'You have duplicates in json keys column (#5):\n\n';
+  for (var i = 0; i < duplicates.length; i++) {
+    msg += duplicates[i] + '\n';
   }
-  return result;
+  msg +=
+    '\nJson will be formed, but consider to change keys in json file to avoid compilation errors.';
+  SpreadsheetApp.getUi().alert(msg);
+}
+
+// ************************ json object construct ***************************
+// convert json to string
+// remove leading and ending curly brackets,
+// remove two leading spaces in each line
+// remove backslash escaping
+function jsonStringFromRow_(row) {
+  return JSON.stringify(jsonFromRow_(row), null, 2)
+    .split('\n')
+    .slice(1, -1)
+    .map(function(str) {
+      return str.replace(/\s{2}/, '').replace(/\\\\/g, '\\');
+    })
+    .join('\n');
 }
 
 // audio file name without extension
@@ -165,18 +151,37 @@ function jsonFromRow_(row) {
   return json;
 }
 
-// convert json to string
-// remove leading and ending curly brackets,
-// remove two leading spaces in each line
-// remove backslash escaping
-function jsonStringFromRow_(row) {
-  return JSON.stringify(jsonFromRow_(row), null, 2)
-    .split('\n')
-    .slice(1, -1)
-    .map(function(str) {
-      return str.replace(/\s{2}/, '').replace(/\\\\/g, '\\');
-    })
-    .join('\n');
+// text/audio entry
+function makeLangEntry_(lang, text, audioFilename) {
+  var currentPaths = audioPaths[lang];
+  if (!currentPaths) throw new Error('Cant find paths for language: ' + lang);
+  var result = {
+    text: text
+  };
+  if (!isErrorOrEmpty_(audioFilename)) {
+    result.audio = {
+      mp3: currentPaths.mp3 + audioFilename + '.mp3',
+      ogg: currentPaths.ogg + audioFilename + '.ogg'
+    };
+  }
+  return result;
+}
+
+// ************************ helpers ***************************
+// s.e.
+function isErrorOrEmpty_(cell) {
+  var errorValues = [
+    '',
+    '#N/A',
+    '#ERROR!',
+    '#NULL!',
+    '#NAME?',
+    '#REF!',
+    '#NUM!',
+    '#VALUE!',
+    '#DIV/0!'
+  ];
+  return errorValues.indexOf(cell) !== -1;
 }
 
 // copyright by mustache.js
