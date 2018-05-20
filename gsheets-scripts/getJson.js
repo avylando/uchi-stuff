@@ -66,6 +66,31 @@ function makeJson_() {
   return rangeValues.map(jsonStringFromRow_).join(',\n');
 }
 
+// s.e.
+function notifyAboutDuplicates_(duplicates) {
+  var msg = 'You have duplicates in json keys column (#5):\n\n';
+  for (var i = 0; i < duplicates.length; i++) {
+    msg += duplicates[i] + '\n';
+  }
+  msg +=
+    '\nJson will be formed, but consider to change keys in json file to avoid compilation errors.';
+  SpreadsheetApp.getUi().alert(msg);
+}
+
+// find and notify user about duplicates in json keys column
+function assertJsonKeysDuplicates_(array) {
+  var duplicates = [];
+  for (var i = 0; i < array.length; i++) {
+    var val = array[i];
+    array.indexOf(val, i + 1) > -1 &&
+      duplicates.indexOf(val) === -1 &&
+      duplicates.push(val);
+  }
+  duplicates.length > 0 && notifyAboutDuplicates_(duplicates);
+  Logger.log(array);
+  Logger.log(duplicates);
+}
+
 // assert range and values in columns 1,2,5 (texts and json key)
 function assert_(range) {
   var isErrorInRange = !range || range.length < 1 || range[0].length < 5;
@@ -82,6 +107,11 @@ function assert_(range) {
     throw new Error(
       'Cells in columns 1,2,5 must contain non-empty, non-error values'
     );
+  assertJsonKeysDuplicates_(
+    range.map(function(row) {
+      return row[4];
+    })
+  );
 }
 
 // s.e.
