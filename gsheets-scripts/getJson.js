@@ -1,4 +1,16 @@
-// Creates a custom menu in Google Sheets when the spreadsheet opens.
+// paths to audio files in repository for different languages
+var audioPaths = {
+  en: {
+    mp3: '/share/happy_numbers/assets/sound/all/English-All/Mp3_128kbps/',
+    ogg: '/share/happy_numbers/assets/sound/all/English-All/Ogg/'
+  },
+  es: {
+    mp3: '/share/happy_numbers/assets/sound/all/Spanish-All/Mp3_128kbps/',
+    ogg: '/share/happy_numbers/assets/sound/all/Spanish-All/Ogg/'
+  }
+};
+
+// creates a custom menu in Google Sheets when the spreadsheet opens
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Tools')
@@ -8,7 +20,6 @@ function onOpen() {
 
 // accessible from 'Make JSON const entries' menu
 function makeJsonSidebar_() {
-  Logger.log(makeJson_());
   var htmlOutput = HtmlService.createHtmlOutput(getSidebarContent_()).setTitle(
     'Chunk json const entries'
   );
@@ -29,6 +40,7 @@ function getCopyScript_() {
   document.getElementById('copy-button').innerHTML = 'Copied!';
 }
 
+// s.e.
 function getSidebarContent_() {
   return (
     '' +
@@ -50,41 +62,58 @@ function makeJson_() {
   var rangeValues = SpreadsheetApp.getActiveSheet()
     .getActiveRange()
     .getValues();
-  assertRange_(rangeValues);
+  assert_(rangeValues);
   return rangeValues.map(jsonStringFromRow_).join(',\n');
 }
 
-// assert
-function assertRange_(range) {
+// assert range and values in columns 1,2,5 (texts and json key)
+function assert_(range) {
   var isErrorInRange = !range || range.length < 1 || range[0].length < 5;
   if (isErrorInRange)
     throw new Error('Please select range of cells with 5 columns or more');
+  var isErrorInValues = range.some(function(row) {
+    return (
+      isErrorOrEmpty_(row[0]) ||
+      isErrorOrEmpty_(row[1]) ||
+      isErrorOrEmpty_(row[4])
+    );
+  });
+  if (isErrorInValues)
+    throw new Error(
+      'Cells in columns 1,2,5 must contain non-empty, non-error values'
+    );
 }
 
-// paths to audio files in repository for different languages
-var audioPaths = {
-  en: {
-    mp3: '/share/happy_numbers/assets/sound/all/English-All/Mp3_128kbps/',
-    ogg: '/share/happy_numbers/assets/sound/all/English-All/Ogg/'
-  },
-  es: {
-    mp3: '/share/happy_numbers/assets/sound/all/Spanish-All/Mp3_128kbps/',
-    ogg: '/share/happy_numbers/assets/sound/all/Spanish-All/Ogg/'
-  }
-};
+// s.e.
+function isErrorOrEmpty_(cell) {
+  var errorValues = [
+    '',
+    '#N/A',
+    '#ERROR!',
+    '#NULL!',
+    '#NAME?',
+    '#REF!',
+    '#NUM!',
+    '#VALUE!',
+    '#DIV/0!'
+  ];
+  return errorValues.indexOf(cell) !== -1;
+}
 
 // text/audio entry
 function makeLangEntry_(lang, text, audioFilename) {
   var currentPaths = audioPaths[lang];
   if (!currentPaths) throw new Error('Cant find paths for language: ' + lang);
-  var r = {
-    text: text,
-    audio: {
+  var result = {
+    text: text
+  };
+  if (!isErrorOrEmpty_(audioFilename)) {
+    result.audio = {
       mp3: currentPaths.mp3 + audioFilename + '.mp3',
       ogg: currentPaths.ogg + audioFilename + '.ogg'
-    }
-  };
-  return r;
+    };
+  }
+  return result;
 }
 
 // audio file name without extension
@@ -110,8 +139,9 @@ function jsonFromRow_(row) {
 }
 
 // convert json to string
-// and removing leading and ending curly brackets,
-// and removing two leading spaces in each line
+// remove leading and ending curly brackets,
+// remove two leading spaces in each line
+// remove backslash escaping
 function jsonStringFromRow_(row) {
   return JSON.stringify(jsonFromRow_(row), null, 2)
     .split('\n')
