@@ -62,7 +62,6 @@ function getCopyScript_() {
   document.execCommand('copy');
   document.body.removeChild(dummy);
   document.getElementById('copy-button').innerHTML = msgs.sidebar.afterClick;
-  document.getElementById('copy-button').disabled = true;
 }
 
 // s.e.
@@ -84,7 +83,6 @@ function getSidebarHelpContent_() {
   + '<p>Пункт меню <br><b>' + msgs.menu.entries.auto + '</b><br> используется для генерации JSON с созданием ключа на основе английского текста (столбец #1).</p>'
   + '<p>Для использования нужно предварительно выбрать диапазон ячеек с содержимым вида:</p>'
   + '<table>'
-  //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th></tr>'
   + '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td></tr>'
   + '</table>'
   + '<p>Количество строк - произвольное. Первый и второй столбцы должны содержать непустые и неошибочные (для формул) значения.</p>'
@@ -92,7 +90,6 @@ function getSidebarHelpContent_() {
   + '<p>Пункт меню <br><b>' + msgs.menu.entries.manual + '</b><br> используется для генерации JSON с созданием ключа на основе пользовательского столбца (#5).</p>'
   + '<p>Для использования нужно предварительно выбрать диапазон ячеек с содержимым вида:</p>'
   + '<table>'
-  //+ '<tr><th>Text ENG</th><th>Text SP</th><th>Voice file ENG</th><th>Voice file ESP</th><th>JSON key</th></tr>'
   + '<tr><td>Solve</td><td>Resuelve</td><td>000048-en-ca.mp3</td><td>000042-sp-ca.mp3</td><td>solveText</td></tr>'
   + '</table>'
   + '<p>Количество строк - произвольное. Первый, второй и пятый столбцы должны содержать непустые и неошибочные (для формул) значения.</p>'
