@@ -1,0 +1,42 @@
+script_16392-->
+init-->
+render-->
+play-->
+animsFork-->animateLegs;
+animsFork-->animatePath;
+animsFork-->
+click(c|.tailClick)-->
+removeHandlersAndWait-->
+whatFrame;
+  whatFrame-[other]->
+  delay(50)-->
+  whatFrame;
+
+  whatFrame-[first]->
+  actualStop-->
+  delay(300)-->
+  animateTail-->
+  computePathOutOfScreen-->
+  animateOutOfScreen-->
+
+  # radio buttons part
+  fadeOutScene-->
+  rerender-->
+  fadeInScene-->
+  include(radio_buttons)-->
+  the_end();
+
+render = {
+  title-->
+  path-->
+  lizard-->
+  next();
+};
+
+rerender = {
+  delete-->
+  change-->
+  add-->
+  addRadioButtons-->
+  next();
+};

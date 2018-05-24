@@ -1,0 +1,18 @@
+{
+  "(step: description)": {
+    "prefix": "step",
+    "body": ["(${1:step}: ${2:description})-$3->$4"]
+  },
+  "delay(1000)": {
+    "prefix": "delay",
+    "body": ["delay(${1:1000})-->$2"]
+  },
+  "click()": {
+    "prefix": "click",
+    "body": ["click(${1:step}|${2:selector})-->$3"]
+  },
+  "drag()": {
+    "prefix": "drag",
+    "body": ["drag(${1:step}|${2:selector})-->$3"]
+  }
+}

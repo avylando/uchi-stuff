@@ -1,0 +1,108 @@
+{
+  "$schema":
+    "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Graph",
+  "patterns": [
+    {
+      "match":
+        "\\b(include|drag|next|the_end|delay|click|read_input|read|fork|join|wait|read_quill)\\b(?:\\(([^\\)]+)\\))?",
+      "captures": {
+        "1": {
+          "name": "keyword.control.graph"
+        },
+        "2": {
+          "name": "variable.parameter.function.graph"
+        }
+      }
+    },
+    {
+      "match": "([\\w\\s]+)\\;",
+      "captures": {
+        "1": {
+          "name": "entity.name.instance.graph"
+        }
+      }
+    },
+    {
+      "match": "\\(([\\w\\s]+):([^\\)]+)\\)(?:-\\[([\\w:]+)\\])?",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.graph"
+        },
+        "2": {
+          "name": "comment.line.number-sign.graph"
+        },
+        "3": {
+          "name": "string.quoted.single.graph"
+        }
+      }
+    },
+    {
+      "match": "\\(?([\\w\\s]+)\\)?-\\[([\\w:]+)\\]",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.graph"
+        },
+        "2": {
+          "name": "string.quoted.single.graph"
+        }
+      }
+    },
+    {
+      "match": "([\\w\\s]+)-->",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.graph"
+        }
+      }
+    },
+    {
+      "match": "(?:\\((script_\\d+)\\))|\\(([\\w\\s]+)\\)|(?:([\\w\\s]+);)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.graph"
+        },
+        "2": {
+          "name": "entity.name.function.graph"
+        },
+        "3": {
+          "name": "entity.name.function.graph"
+        }
+      }
+    },
+    {
+      "match": "([\\w\\s]+)=",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.graph"
+        }
+      }
+    },
+    {
+      "match": "#.*",
+      "name": "comment.line.number-sign.graph"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.graph",
+          "match": "\\b(if|while|for|return)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.graph",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.graph",
+          "match": "\\\\."
+        }
+      ]
+    }
+  },
+  "scopeName": "source.graph"
+}
